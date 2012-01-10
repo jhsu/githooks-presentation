@@ -1,5 +1,0 @@
-!SLIDE
-
-# 
-
-!SLIDE
