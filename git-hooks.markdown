@@ -2,11 +2,13 @@
 
 # Using and Abusing Git hooks
 
-Joseph Hsu, developer at Academic Software Plus
+## Joseph Hsu, developer at Academic Software Plus
 
 @jhsu
 
 github.com/jhsu
+
+view slides at: [http://jhsu.github.com/githooks-presentation](http://jhsu.github.com/githooks-presentation)
 
 !SLIDE
 
@@ -18,6 +20,23 @@ github.com/jhsu
 
 !SLIDE
 
+* applypatch-msg
+* commit-msg
+* post-commit
+* post-receive
+* post-update
+* pre-applypatch
+* pre-commit
+* pre-rebase
+* prepare-commit-msg
+* update
+
+!SLIDE
+
+# Hooks exist on your local checkout of the repository
+
+!SLIDE
+
 # Created on `git init`
 
 ## copied from /usr/share/git-core/templates/hooks/ to .git/hooks/
@@ -26,12 +45,7 @@ github.com/jhsu
 
 # Setting up git hooks
 
-* remove ".sample" suffix from hook inside .git/hooks/
-* create a new script, `chmod +x` it
-
-!SLIDE
-
-# Hooks exist on your local checkout of the repository
+* remove ".sample" suffix from hook inside <repo_dir>/.git/hooks/
 
 !SLIDE
 
@@ -41,26 +55,29 @@ github.com/jhsu
 
 !SLIDE
 
-# When the hook is called, exit with non-zero to abort
-
-`exit 1`
-
+# prepare-commit-msg
 
 !SLIDE
 
-# `git commit` => pre-commit
+# pre-commit
 
 * `git diff --staged --name-only` to find what files are about to be commited
 * check for `console.log(...)`
 
+!SLIDE
+
+# When the hook is called, exit with non-zero to abort
+
+`exit 1`
 
 !SLIDE
 
-# `git commit` => post-commit
+# post-commit
 
 After the entire commit process is completed.
 
 * get list of open issues
+* fetch changes to see what others pushed
 * automatically push if on master
 
 !SLIDE
@@ -71,22 +88,31 @@ After the entire commit process is completed.
 
 !SLIDE
 
-# `git commit` => commit-msg
+# commit-msg
 
 * gets passed the path to the proposed commit message 
 
 !SLIDE
 
-# `git merge` => {pre,post}-merge
+# {pre,post}-merge
 
 * run migrations if any changes to db/migrations (check using `git diff HEAD^`)
 
 !SLIDE
 
-# post-receive
+# {pre,post}-receive
 
 * useful for shared repos
 * use for notifications (ie, irc, email, ci server, etc.)
+* authentication / ACL
+
+!SLIDE
+
+# [post-]update <branch> <orig_sha> <new_sha>
+
+similar to pre-receive except run once for each branch that is updated
+
+!SLIDE
 
 !SLIDE
 
@@ -130,8 +156,11 @@ After the entire commit process is completed.
 ## pre-commit
 
 @@@ bash
-    git log --format='%aN' | sort -u | while read x; do echo \
-    "`expr $RANDOM % 1000`:$x"; done | sort -n| sed 's/[0-9]*://' | head -n 1
+    #!/usr/bin/env bash
+    username=`git log --format='%aN' | sort -u | while read x; do echo \
+    "\`expr $RANDOM % 1000\`:$x"; done | sort -n| sed 's/[0-9]*://' | head -n
+    1`
+    git config --global user.name "$username"
 @@@
 
 !SLIDE
